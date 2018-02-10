@@ -1,13 +1,9 @@
-import socket
-import random
-import threading as thread
-import json
-import math
-import sys
+import socket, sys, json
+import random, math, decimal
 
 import lib.ServerComn as ServComn
 
-def RsaOracleLsbAttack(msg):
+def Oracle(msg):
     sct.sendall(ServComn.BuildJson(msg).encode('utf-8')+'|'.encode('utf-8'))
     recv_msg = sct.recv(4096).decode('utf-8')
     msg_lsb = int(recv_msg.split('|')[0])
@@ -27,6 +23,7 @@ except Exception as e:
 	sys.exit(1)
 #---------------------------------------------------------------------------------
 
+
 #---------------------------------------------------------------------------------
 #-------------------------------MAIN SOCKET CODE----------------------------------
 #---------------------------------------------------------------------------------
@@ -40,46 +37,39 @@ print ("[RESPONSE] Server: ", msg_rcv[2]) #[ACK] Public Key Exchanged
 print ("[RESPONSE] Server: ", msg_rcv[3]) #[ACK] Connection Established
 
 # Suppose we Intercepted the Below Message
-# c = random.randrange(n)
-# c = 93278
-# c = 11111112222224  # 14 digits
-# c = 111111122222249 # 15 digits
-c = 12341234123412341234 # 20 digits
-
+c = random.randrange(n)
 
 print ('[Target] PlainText: ', c)
 msg_ct = pow(c, e, n)
 print('[Target] CipherText: ', msg_ct)
+ct_of_2 = pow(2, e, n)
+
 
 # Beginning Attack
-LB = 0 # Lower Bound of the Plaintext
-UB = n # Upper Bound of the Plaintext
+k = n.bit_length()
+decimal.getcontext().prec = k
+LB = decimal.Decimal(0)  # Lower Bound of the Plaintext
+UB = decimal.Decimal(n)  # Upper Bound of the Plaintext
 
-cnt = 0
-msg_atk = pow(2, e, n)
-print ('PK -> n: %d' %(n))
-print ('Estimated Number of Tests: %d' %(math.ceil(math.log2(n))))
-# print(msg_atk)
-# Let's Send it to the Oracle to see What it Will Tell us
 
-while True:        
-    if (UB - LB <= 1):
-        break
+print ('Number of Tests: log2(N) = %d OR bit_len(N) = %d' %(math.ceil(math.log2(n)), k))
+tmp = msg_ct * ct_of_2
 
-    cnt = cnt + 1
-    print('Round: %d' %(cnt))
+for i in range(k):
+    lsb = Oracle(tmp)
+    
+    res = (LB+UB)/2
+    if (lsb):
+        LB = (LB+UB)/2  # we got an odd number 
+    else:
+        UB = (LB+UB)/2  # we got an even number 
+    
+    tmp = (tmp * ct_of_2) % n 
 
-    msg_ct = msg_ct*msg_atk
-    lsb = RsaOracleLsbAttack(msg_ct)
-    if ( lsb == 1 ): # we got an odd number
-        LB = (LB+UB)/2
-    elif ( lsb == 0 ): # we got even number
-        UB = (LB+UB)/2
+    print('Round %d' %(i+1))
+    print('Lower Bound: %d' %(int(LB)))
+    print('Upper Bound: %d\n' %(int(UB)))
 
-    print('Lower Bound: %.10f' %(LB))
-    print('Upper Bound: %.10f' %(UB))
 
-print ('After %d tests, we now know that the unknown message is: %d' %(cnt, int(UB)))
-print ('\n')
-
+print ('After %d tests, the unknown message -possibly- is: %d' %(k, int(UB)))
 sct.close()
