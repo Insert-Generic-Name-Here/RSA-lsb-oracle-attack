@@ -59,11 +59,16 @@ def ClienThread(conn, rsa):
     conn.sendall(msg_snd)
 
     while(True):
-        recv_msg = recv_timeout(conn, timeout=0.1)
-        recv_msg = recv_msg.decode('utf-8') # Recieve the Encrypted Message
-        recv_msg = recv_msg.split('|')
-        cipherText = int(json.loads(recv_msg[0])['msg'][0])
-        # print('Cipher Text: ', cipherText)
-        plainText = rsa.Decrypt(cipherText)
-        # print('Plain Text: ', plainText)
-        conn.sendall(str(plainText%2).encode('utf-8')+'|'.encode('utf-8'))
+        try:
+            recv_msg = recv_timeout(conn, timeout=0.1)
+            recv_msg = recv_msg.decode('utf-8') # Recieve the Encrypted Message
+            recv_msg = recv_msg.split('|')
+            cipherText = int(json.loads(recv_msg[0])['msg'][0])
+            # print('Cipher Text: ', cipherText)
+            plainText = rsa.Decrypt(cipherText)
+            # print('Plain Text: ', plainText)
+            conn.sendall(str(plainText%2).encode('utf-8')+'|'.encode('utf-8'))
+        except json.decoder.JSONDecodeError:
+            print ('Connection Terminated.\n')
+            conn.close()
+            break
