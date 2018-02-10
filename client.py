@@ -52,7 +52,7 @@ LB = decimal.Decimal(0)  # Lower Bound of the Plaintext
 UB = decimal.Decimal(n)  # Upper Bound of the Plaintext
 
 
-print ('Number of Tests: log2(N) = %d OR bit_len(N) = %d' %(math.ceil(math.log2(n)), k))
+print ('Number of Tests: log2(N) = %d OR bit_len(N) = %d\n' %(math.ceil(math.log2(n)), k))
 tmp = msg_ct * ct_of_2
 
 for i in range(k):
@@ -66,10 +66,10 @@ for i in range(k):
     
     tmp = (tmp * ct_of_2) % n 
 
-    print('Round %d' %(i+1))
-    print('Lower Bound: %d' %(int(LB)))
-    print('Upper Bound: %d\n' %(int(UB)))
+    sys.stdout.flush()
+    sys.stdout.write('Decrypting... %d\r' %(int(UB)))
 
+print('\nDecrypted.')
+print('\nPossible PlainText: ', int(UB))
 
-print ('After %d tests, the unknown message -possibly- is: %d' %(k, int(UB)))
 sct.close()
