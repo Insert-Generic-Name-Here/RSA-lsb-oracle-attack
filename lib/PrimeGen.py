@@ -28,7 +28,7 @@ class PrimeGen:
             return False       
     
     # Auxiliary Method for Generating a Prime Number
-    def __Generate(self, B, tests):
+    def Generate(self, B, tests=20):
         FND = False
         while FND == False:
             lb = 2**(B - 1)
@@ -37,10 +37,10 @@ class PrimeGen:
         return p
     
     # The Method that Generates a *safe* Prime Number
-    def Generate(self, B, tests=20):
-        p = self.__Generate(B - 1, tests)
+    def GenerateSafe(self, B, tests=20):
+        p = self.Generate(B - 1, tests)
         q = 2 * p + 1
         while not self.__IsPrime(q, tests):
-            p = self.__Generate(B - 1, tests)
+            p = self.Generate(B - 1, tests)
             q = 2 * p + 1
         return q
