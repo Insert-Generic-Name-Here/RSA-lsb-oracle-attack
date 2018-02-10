@@ -3,6 +3,11 @@ import random, math, decimal
 
 import lib.ServerComn as ServComn
 
+def Oracle(msg):
+    sct.sendall(ServComn.BuildJson(msg).encode('utf-8')+'|'.encode('utf-8'))
+    recv_msg = sct.recv(4096).decode('utf-8')
+    msg_lsb = int(recv_msg.split('|')[0])
+    return msg_lsb
 
 #---------------------------------------------------------------------------------
 #-----------------------------CONNECT TO SERVER SOCKET----------------------------
@@ -51,7 +56,7 @@ print ('Number of Tests: log2(N) = %d OR bit_len(N) = %d\n' %(math.ceil(math.log
 tmp = msg_ct * ct_of_2
 
 for i in range(k):
-    lsb = ServComn.Oracle(sct, tmp)
+    lsb = Oracle(tmp)
     
     res = (LB+UB)/2
     if (lsb):
@@ -66,4 +71,5 @@ for i in range(k):
 
 print('\nDecrypted.')
 print('\nPossible PlainText: ', int(UB))
+
 sct.close()
