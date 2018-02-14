@@ -33,7 +33,6 @@ print ("[RESPONSE] Server: ", msg_rcv[3]) #[ACK] Connection Established
 
 # Suppose we Intercepted the Below Message
 c = random.randrange(n)
-
 print ('[Target] PlainText: ', c)
 msg_ct = pow(c, e, n)
 print('[Target] CipherText: ', msg_ct)
@@ -61,9 +60,8 @@ for i in range(k):
     
     tmp = (tmp * ct_of_2) % n 
 
-    sys.stdout.flush()
-    sys.stdout.write('Decrypting... %d\r' %(int(UB)))
-
+    print('Decrypting... %d\r' %(int(UB)), flush=True)
+    
 print('\nDecrypted.')
 print('\nPossible PlainText: ', int(UB))
 sct.close()

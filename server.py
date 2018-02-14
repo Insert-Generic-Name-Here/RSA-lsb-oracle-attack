@@ -2,7 +2,7 @@ import socket
 import threading
 import sys
 
-import lib.Cryptlib as Cryptlib
+import lib.Cryptlib2 as Cryptlib2
 import lib.ServerComn as ServComn
 
 #---------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ except socket.gaierror as err:
     sys.exit()
 print ('[ACK] Socket bind complete')
  
-rsa = Cryptlib.RSA(128)
+rsa = Cryptlib2.RSA(int(sys.argv[1]))
 
 print ('RSA Public Key\ne: %d\nn: %d' %(rsa.e, rsa.n))
     
