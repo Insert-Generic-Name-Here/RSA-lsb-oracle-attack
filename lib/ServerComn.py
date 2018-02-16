@@ -66,7 +66,7 @@ def ClienThread(conn, rsa):
             cipherText = int(json.loads(recv_msg[0])['msg'][0])
             # print('Cipher Text: ', cipherText)
             plainText = rsa.Decrypt(cipherText)
-            # print('Plain Text: ', plainText)
+            print('Decrypted Message: ', plainText)
             conn.sendall(str(plainText%2).encode('utf-8')+'|'.encode('utf-8'))
         except json.decoder.JSONDecodeError:
             print ('Connection Terminated.\n')

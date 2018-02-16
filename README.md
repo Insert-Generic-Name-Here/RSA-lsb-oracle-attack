@@ -1,6 +1,15 @@
 
 # A Demonstration for the RSA LSB Oracle Attack
 
+### Dependencies
+*  decimal
+*  gmpy2
+*  json
+*  socket
+*  threading
+*  tqdm
+
+
 ### Abstract
 The main concern of this repository is the demonstration of retrieving a Plain RSA-Encrypted message knowing only the Least Significant Bit (LSB) of the plaintext. Finally to show the importance of padding the message before encryption we implement the RSA encryption algorithm with PKCS#1 v1.5 padding and we comment the effect of this attack on a message encrypted with the previous standard.
 
@@ -51,6 +60,8 @@ This Algorithm is similar to Binary Search and it's Complexity is log2(N). And b
 A Black Box that decrypts any Plain RSA encrypted message and returns the Least Significant Bit (LSB) of the plaintext.
 
 ### Running the Attack
+> Note: To run both sockets without any problems, please install Anaconda3 (or if you insist use pip to install all imported libraries)
+
 To Simulate the Oracle:
 ```python
 python server.py <RSA-BITS>

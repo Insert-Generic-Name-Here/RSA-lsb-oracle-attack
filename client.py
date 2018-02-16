@@ -1,6 +1,7 @@
 import socket, sys, json
 import random, math, decimal
 
+from tqdm import tqdm
 import lib.ServerComn as ServComn
 
 
@@ -49,7 +50,7 @@ UB = decimal.Decimal(n)  # Upper Bound of the Plaintext
 print ('Number of Tests: log2(N) = %d OR bit_len(N) = %d\n' %(math.ceil(math.log2(n)), k))
 tmp = msg_ct * ct_of_2
 
-for i in range(k):
+for i in tqdm(range(k), desc='Decrypting'):
     lsb = ServComn.Oracle(sct, tmp)
     
     res = (LB+UB)/2
@@ -59,8 +60,6 @@ for i in range(k):
         UB = (LB+UB)/2  # we got an even number 
     
     tmp = (tmp * ct_of_2) % n 
-
-    print('Decrypting... %d\r' %(int(UB)), flush=True)
     
 print('\nDecrypted.')
 print('\nPossible PlainText: ', int(UB))
