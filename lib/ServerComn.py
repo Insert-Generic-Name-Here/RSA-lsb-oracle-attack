@@ -10,10 +10,14 @@ def BuildJson(word):
 
 
 def Oracle(the_socket, msg):
-    the_socket.sendall(BuildJson(msg).encode('utf-8')+'|'.encode('utf-8'))
-    recv_msg = the_socket.recv(4096).decode('utf-8')
-    msg_lsb = int(recv_msg.split('|')[0])
-    return msg_lsb
+    pkg = {'ciphertext':msg}
+    pkg = (json.dumps(pkg)).encode('utf-8')
+    the_socket.sendall(pkg)
+
+    pkg = recv_timeout(the_socket, timeout=0.05).decode('utf-8')
+    pkg = json.loads(pkg)
+
+    return pkg['lsb']
 
 
 # Recieve full data with the recv socket function in Python
@@ -51,23 +55,22 @@ def recv_timeout(the_socket,timeout=2):
 
 #Function for handling connections. This will be used to create threads
 def ClienThread(conn, rsa):
-    msg_snd = ((BuildJson(rsa.e) + '|').encode('utf-8')            +
-              ((BuildJson(rsa.n)+'|')).encode('utf-8')             +
-              (('[ACK] Public Key Exchange.'+'|').encode('utf-8')) +
-              (('[ACK] Server Connection.'+'|').encode('utf-8')))
-    
-    conn.sendall(msg_snd)
+    pkg = {'e':rsa.e, 'n': rsa.n,\
+           'ack':['[ACK] Public Key Exchange.', '[ACK] Server Connection.']}
+    pkg = (json.dumps(pkg)).encode('utf-8')
+    conn.sendall(pkg)
 
     while(True):
         try:
-            recv_msg = recv_timeout(conn, timeout=0.1)
-            recv_msg = recv_msg.decode('utf-8') # Recieve the Encrypted Message
-            recv_msg = recv_msg.split('|')
-            cipherText = int(json.loads(recv_msg[0])['msg'][0])
+            pkg = (recv_timeout(conn, timeout=0.05)).decode('utf-8') # Recieve the Encrypted Message
+            pkg = json.loads(pkg)
+            cipherText = pkg['ciphertext']
             # print('Cipher Text: ', cipherText)
             plainText = rsa.Decrypt(cipherText)
             print('Decrypted Message: ', plainText)
-            conn.sendall(str(plainText%2).encode('utf-8')+'|'.encode('utf-8'))
+            pkg = {'lsb': int(plainText % 2)}
+            pkg = (json.dumps(pkg)).encode('utf-8')
+            conn.sendall(pkg)
         except json.decoder.JSONDecodeError:
             print ('Connection Terminated.\n')
             conn.close()

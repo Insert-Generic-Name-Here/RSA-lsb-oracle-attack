@@ -23,14 +23,14 @@ except Exception as e:
 #---------------------------------------------------------------------------------
 #-------------------------------MAIN SOCKET CODE----------------------------------
 #---------------------------------------------------------------------------------
-msg_rcv = sct.recv(4096)
-msg_rcv = msg_rcv.decode('utf-8').split('|')
+pkg = (ServComn.recv_timeout(sct,timeout=0.05)).decode('utf-8')
+pkg = json.loads(pkg)
 
-e = int(json.loads(msg_rcv[0])['msg'][0])
-n = int(json.loads(msg_rcv[1])['msg'][0])
+e = pkg['e']
+n = pkg['n']
 
-print ("[RESPONSE] Server: ", msg_rcv[2]) #[ACK] Public Key Exchanged
-print ("[RESPONSE] Server: ", msg_rcv[3]) #[ACK] Connection Established
+print ("[RESPONSE] Server: ", pkg['ack'][0]) #[ACK] Public Key Exchanged
+print ("[RESPONSE] Server: ", pkg['ack'][1]) #[ACK] Connection Established
 
 # Suppose we Intercepted the Below Message
 c = random.randrange(n)
